@@ -31,6 +31,17 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
   const [tone, setTone] = useState<Tone>(initialTone ?? 'lumen');
   const isLumen = tone === 'lumen';
   const [showAdvice, setShowAdvice] = useState(false);
+  const [animatingShare, setAnimatingShare] = useState<'lumen' | 'noir' | null>(null);
+
+  const handleShare = (e: React.MouseEvent<HTMLAnchorElement>, url: string, type: 'lumen' | 'noir') => {
+    e.preventDefault();
+    if (animatingShare) return;
+    setAnimatingShare(type);
+    setTimeout(() => {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      setAnimatingShare(null);
+    }, 600);
+  };
 
   // キメラ（同票軸）は両極を展開した全候補タイプ。確定軸は winner のみ。
   // 例: (E/I)STP → ["ESTP", "ISTP"]。確定タイプのみなら長さ1。
@@ -368,9 +379,10 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
         {isLumen ? (
           <a
             href={xIntentUrlLight}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glow-cta glow-cta-lumen flex items-center justify-center gap-2 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-6 py-4 text-sm font-bold tracking-wide text-amber-200 backdrop-blur-sm hover:bg-amber-300/20"
+            onClick={(e) => handleShare(e, xIntentUrlLight, 'lumen')}
+            className={`glow-cta glow-cta-lumen flex items-center justify-center gap-2 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-6 py-4 text-sm font-bold tracking-wide text-amber-200 backdrop-blur-sm hover:bg-amber-300/20 ${
+              animatingShare === 'lumen' ? 'animate-flash-fast' : ''
+            }`}
           >
             <span className="text-base">𝕏</span>
             光（強み）をシェアする
@@ -378,9 +390,10 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
         ) : (
           <a
             href={xIntentUrlNoir}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="glow-cta glow-cta-noir flex items-center justify-center gap-2 rounded-2xl border border-blood/30 bg-blood/10 px-6 py-4 text-sm font-bold tracking-wide text-blood-soft backdrop-blur-sm hover:bg-blood/20"
+            onClick={(e) => handleShare(e, xIntentUrlNoir, 'noir')}
+            className={`glow-cta glow-cta-noir flex items-center justify-center gap-2 rounded-2xl border border-blood/30 bg-blood/10 px-6 py-4 text-sm font-bold tracking-wide text-blood-soft backdrop-blur-sm hover:bg-blood/20 ${
+              animatingShare === 'noir' ? 'animate-flash-fast' : ''
+            }`}
           >
             <span className="text-base">𝕏</span>
             闇（見栄）をシェアする
