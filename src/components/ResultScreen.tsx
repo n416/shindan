@@ -12,6 +12,7 @@ import {
   CHIMERA_4_PERSONA,
   CHIMERA_4_PERSONA_LIGHT,
 } from '../data/personas';
+import { PERSONA_ADVICES, CHIMERA_ADVICES } from '../data/advices';
 
 interface Props {
   result: DiagnosisResult;
@@ -29,6 +30,7 @@ type Tone = 'noir' | 'lumen';
 export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
   const [tone, setTone] = useState<Tone>(initialTone ?? 'lumen');
   const isLumen = tone === 'lumen';
+  const [showAdvice, setShowAdvice] = useState(false);
 
   // キメラ（同票軸）は両極を展開した全候補タイプ。確定軸は winner のみ。
   // 例: (E/I)STP → ["ESTP", "ISTP"]。確定タイプのみなら長さ1。
@@ -111,6 +113,11 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
         chip: 'border-blood/50 bg-blood/10',
         chipText: 'text-blood-soft',
       };
+
+  // ── アドバイスの取得 ──
+  const adviceData = hasChimera
+    ? CHIMERA_ADVICES[conflicts.length]
+    : PERSONA_ADVICES[selectedType];
 
   // ── シェア文の生成（光・闇の2種類を固定で生成） ──
   const baseShareUrl = typeof window !== 'undefined'
@@ -295,6 +302,41 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
               <p className="text-[14px] leading-loose text-white/85">{c.text}</p>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* 闇モード用アドバイスセクション */}
+      {!isLumen && adviceData && (
+        <div className="animate-fade-up mt-8 w-full max-w-md" style={{ animationDelay: '0.34s' }}>
+          {!showAdvice ? (
+            <button
+              onClick={() => setShowAdvice(true)}
+              className="glow-cta glow-cta-noir group relative flex w-full items-center justify-center rounded-2xl border border-blood/30 bg-blood/10 py-4 text-sm font-bold tracking-widest text-blood-soft backdrop-blur-sm transition-all hover:bg-blood/20"
+            >
+              <span className="bg-gradient-to-r from-white to-blood-soft bg-clip-text text-transparent">
+                明日から出来るアドバイスを見る
+              </span>
+              <span className="ml-2 inline-block transition-transform duration-300 group-hover:translate-y-1">
+                ↓
+              </span>
+            </button>
+          ) : (
+            <div className="animate-fade-up rounded-2xl border border-blood/30 bg-noir-800/80 p-5 text-left">
+              <p className="mb-4 text-center text-[11px] tracking-[0.3em] text-blood-soft">
+                ── アドバイス ──
+              </p>
+              <ul className="space-y-4">
+                {adviceData.advices.map((text, idx) => (
+                  <li key={idx} className="flex gap-3 text-[14px] leading-relaxed text-white/85">
+                    <span className="shrink-0 font-display font-bold text-blood-soft">
+                      {idx + 1}.
+                    </span>
+                    <span>{text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
 
