@@ -44,6 +44,13 @@ export function RevealScreen({ onSelect }: Props) {
           </span>
         </button>
       </div>
+
+      <p
+        className="animate-fade-up mt-8 text-[11px] tracking-widest text-ash/40"
+        style={{ animationDelay: '0.25s' }}
+      >
+        ※ あとから切り替えてもう一方を見ることもできます
+      </p>
     </div>
   );
 }
