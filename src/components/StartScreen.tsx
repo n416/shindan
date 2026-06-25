@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 interface Props {
   onStart: () => void;
   questionCount: number;
@@ -5,6 +7,17 @@ interface Props {
 
 /** スタート画面：タイトルロゴ・キャッチコピー・発光CTA */
 export function StartScreen({ onStart, questionCount }: Props) {
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  const handleStart = () => {
+    if (isAnimating) return;
+    setIsAnimating(true);
+    setTimeout(() => {
+      onStart();
+      setIsAnimating(false);
+    }, 600);
+  };
+
   return (
     <div className="flex min-h-dvh flex-col items-center justify-center px-6 py-16 text-center">
       <div className="animate-fade-up">
@@ -35,8 +48,11 @@ export function StartScreen({ onStart, questionCount }: Props) {
 
       {/* CTA */}
       <button
-        onClick={onStart}
-        className="glow-cta glow-cta-noir group relative mt-12 w-full max-w-xs rounded-2xl border border-blood/50 bg-noir-800/70 px-8 py-5 text-base font-bold tracking-wide backdrop-blur-sm sm:max-w-sm"
+        onClick={handleStart}
+        disabled={isAnimating}
+        className={`glow-cta glow-cta-noir group relative mt-12 w-full max-w-xs rounded-2xl border border-blood/50 bg-noir-800/70 px-8 py-5 text-base font-bold tracking-wide backdrop-blur-sm sm:max-w-sm ${
+          isAnimating ? 'animate-flash-fast' : ''
+        }`}
         style={{ animationDelay: '0.15s' }}
       >
         <span className="bg-gradient-to-r from-white to-blood-soft bg-clip-text text-transparent">
