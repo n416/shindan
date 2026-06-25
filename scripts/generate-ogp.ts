@@ -143,6 +143,8 @@ async function main() {
       html = html.replace(/<title>.*?<\/title>/, `<title>${data.title} | ${siteName}</title>`);
       html = html.replace(/<meta property="og:title" content=".*?"\s*\/?>/i, `<meta property="og:title" content="${data.title} | ${siteName}" />`);
       html = html.replace(/<meta property="og:description" content=".*?"\s*\/?>/i, `<meta property="og:description" content="${shareText}" />`);
+      html = html.replace(/<meta name="twitter:title" content=".*?"\s*\/?>/i, `<meta name="twitter:title" content="${data.title} | ${siteName}" />`);
+      html = html.replace(/<meta name="twitter:description" content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${shareText}" />`);
       
       // 画像が存在すれば置換
       if (data.gifUrl) {
