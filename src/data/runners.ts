@@ -13,7 +13,7 @@
 // ─────────────────────────────────────────────────────────────
 
 /** 全タイプ共通の暫定ベース（未生成タイプの onError フォールバック先） */
-export const RUNNER_BASE = '/sprites/runner-east.gif';
+export const RUNNER_BASE = `${import.meta.env.BASE_URL}sprites/runner-east.gif`;
 
 /**
  * 確定タイプ → 走りスプライトのパス（規約: /sprites/runner-<type小文字>.gif）。
@@ -21,12 +21,12 @@ export const RUNNER_BASE = '/sprites/runner-east.gif';
  * 画像読み込み失敗時に PixelRunner 側で RUNNER_BASE にフォールバックする。
  */
 export function runnerSprite(resolvedType: string): string {
-  return `/sprites/runner-${resolvedType.toLowerCase()}.gif`;
+  return `${import.meta.env.BASE_URL}sprites/runner-${resolvedType.toLowerCase()}.gif`;
 }
 
 /** 確定タイプ → 8方向回転ループのパス（/sprites/spin-<type小文字>.gif）。 */
 export function spinSprite(resolvedType: string): string {
-  return `/sprites/spin-${resolvedType.toLowerCase()}.gif`;
+  return `${import.meta.env.BASE_URL}sprites/spin-${resolvedType.toLowerCase()}.gif`;
 }
 
 // ─────────────────────────────────────────────────────────────
