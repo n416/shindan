@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Choice, Question } from '../types';
 import { ProgressBar } from './ProgressBar';
 
@@ -28,6 +29,17 @@ export function QuestionScreen({
   onAnswer,
   onBack,
 }: Props) {
+  const [animatingLabel, setAnimatingLabel] = useState<'A' | 'B' | null>(null);
+
+  const handleAnswer = (choice: Choice) => {
+    if (animatingLabel) return;
+    setAnimatingLabel(choice.label);
+    setTimeout(() => {
+      onAnswer(choice);
+      setAnimatingLabel(null);
+    }, 600);
+  };
+
   return (
     // key で問題ごとに再マウントしてフェードを効かせる
     <div key={question.id} className="mx-auto flex min-h-dvh max-w-xl flex-col px-5 pb-10 pt-8 sm:pt-12">
@@ -50,24 +62,48 @@ export function QuestionScreen({
 
         {/* 2択カード（縦並び・広いタップ領域） */}
         <div className="flex flex-col gap-4">
-          {question.choices.map((choice) => (
-            <button
-              key={choice.label}
-              onClick={() => onAnswer(choice)}
-              className="group relative w-full rounded-2xl border border-white/10 bg-noir-800/60 p-5 text-left backdrop-blur-sm transition-all duration-300 hover:border-blood-soft hover:bg-noir-700/70 hover:shadow-[0_0_28px_-6px_rgba(226,58,93,0.5)] focus:outline-none focus-visible:border-blood-soft active:scale-[0.99]"
-            >
-              <div className="flex items-start gap-4">
-                <span className="mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full border border-white/15 text-sm font-bold text-ash transition-colors duration-300 group-hover:border-blood-soft group-hover:bg-blood/20 group-hover:text-white">
-                  {choice.label}
-                </span>
-                <p className="text-[15px] leading-relaxed text-white/90 group-hover:text-white">
-                  {choice.text}
-                </p>
-              </div>
-              {/* ホバー時に左端が灯る */}
-              <span className="pointer-events-none absolute inset-y-3 left-0 w-[2px] rounded-full bg-blood-soft opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-            </button>
-          ))}
+          {question.choices.map((choice) => {
+            const isSelected = animatingLabel === choice.label;
+            const isOtherSelected = animatingLabel !== null && !isSelected;
+
+            return (
+              <button
+                key={choice.label}
+                onClick={() => handleAnswer(choice)}
+                disabled={animatingLabel !== null}
+                className={`group relative w-full rounded-2xl border p-5 text-left backdrop-blur-sm transition-all duration-300 focus:outline-none focus-visible:border-blood-soft ${
+                  isSelected
+                    ? 'animate-flash-fast border-blood-soft bg-blood/20 shadow-[0_0_28px_-6px_rgba(226,58,93,0.5)]'
+                    : isOtherSelected
+                    ? 'border-white/10 bg-noir-800/60 opacity-30'
+                    : 'border-white/10 bg-noir-800/60 hover:border-blood-soft hover:bg-noir-700/70 hover:shadow-[0_0_28px_-6px_rgba(226,58,93,0.5)] active:scale-[0.99]'
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <span
+                    className={`mt-0.5 flex h-8 w-8 flex-none items-center justify-center rounded-full border text-sm font-bold transition-colors duration-300 ${
+                      isSelected
+                        ? 'border-blood-soft bg-blood/20 text-white'
+                        : 'border-white/15 text-ash group-hover:border-blood-soft group-hover:bg-blood/20 group-hover:text-white'
+                    }`}
+                  >
+                    {choice.label}
+                  </span>
+                  <p className={`text-[15px] leading-relaxed transition-colors duration-300 ${
+                    isSelected ? 'text-white' : 'text-white/90 group-hover:text-white'
+                  }`}>
+                    {choice.text}
+                  </p>
+                </div>
+                {/* 左端の灯り */}
+                <span
+                  className={`pointer-events-none absolute inset-y-3 left-0 w-[2px] rounded-full bg-blood-soft transition-opacity duration-300 ${
+                    isSelected ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                  }`}
+                />
+              </button>
+            );
+          })}
         </div>
 
         {/* 戻る */}
