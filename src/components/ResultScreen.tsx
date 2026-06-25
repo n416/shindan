@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { DiagnosisResult, Scores } from '../types';
 import { serializeScores } from '../utils/share';
 import { PixelRunner } from './PixelRunner';
@@ -32,6 +32,15 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
   const isLumen = tone === 'lumen';
   const [showAdvice, setShowAdvice] = useState(false);
   const [animatingShare, setAnimatingShare] = useState<'lumen' | 'noir' | null>(null);
+
+  // ── URLの自動書き換え（シェアURLと一致させる） ──
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    url.searchParams.set('r', serializeScores(scores));
+    url.searchParams.set('t', isLumen ? 'l' : 'n');
+    window.history.replaceState(null, '', url.toString());
+  }, [scores, isLumen]);
 
   const handleShare = (e: React.MouseEvent<HTMLAnchorElement>, url: string, type: 'lumen' | 'noir') => {
     e.preventDefault();
