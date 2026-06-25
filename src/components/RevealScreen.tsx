@@ -22,7 +22,7 @@ export function RevealScreen({ onSelect }: Props) {
       >
         <button
           onClick={() => onSelect('lumen')}
-          className="glow-cta group relative w-full rounded-2xl border border-amber-300/30 bg-amber-300/10 px-8 py-5 text-base font-bold tracking-wide text-amber-200 backdrop-blur-sm transition-all hover:bg-amber-300/20"
+          className="glow-cta glow-cta-lumen group relative w-full rounded-2xl border border-amber-300/30 bg-amber-300/10 px-8 py-5 text-base font-bold tracking-wide text-amber-200 backdrop-blur-sm transition-all hover:bg-amber-300/20"
         >
           <span className="bg-gradient-to-r from-amber-200 to-amber-400 bg-clip-text text-transparent">
             光（強み）を見る
@@ -34,7 +34,7 @@ export function RevealScreen({ onSelect }: Props) {
 
         <button
           onClick={() => onSelect('noir')}
-          className="glow-cta group relative w-full rounded-2xl border border-blood/30 bg-blood/10 px-8 py-5 text-base font-bold tracking-wide text-blood-soft backdrop-blur-sm transition-all hover:bg-blood/20"
+          className="glow-cta glow-cta-noir group relative w-full rounded-2xl border border-blood/30 bg-blood/10 px-8 py-5 text-base font-bold tracking-wide text-blood-soft backdrop-blur-sm transition-all hover:bg-blood/20"
         >
           <span className="bg-gradient-to-r from-white to-blood-soft bg-clip-text text-transparent">
             闇（見栄）を見る

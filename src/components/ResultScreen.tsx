@@ -328,7 +328,7 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
             href={xIntentUrlLight}
             target="_blank"
             rel="noopener noreferrer"
-            className="glow-cta flex items-center justify-center gap-2 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-6 py-4 text-sm font-bold tracking-wide text-amber-200 backdrop-blur-sm hover:bg-amber-300/20"
+            className="glow-cta glow-cta-lumen flex items-center justify-center gap-2 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-6 py-4 text-sm font-bold tracking-wide text-amber-200 backdrop-blur-sm hover:bg-amber-300/20"
           >
             <span className="text-base">𝕏</span>
             光（強み）をシェアする
@@ -338,7 +338,7 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
             href={xIntentUrlNoir}
             target="_blank"
             rel="noopener noreferrer"
-            className="glow-cta flex items-center justify-center gap-2 rounded-2xl border border-blood/30 bg-blood/10 px-6 py-4 text-sm font-bold tracking-wide text-blood-soft backdrop-blur-sm hover:bg-blood/20"
+            className="glow-cta glow-cta-noir flex items-center justify-center gap-2 rounded-2xl border border-blood/30 bg-blood/10 px-6 py-4 text-sm font-bold tracking-wide text-blood-soft backdrop-blur-sm hover:bg-blood/20"
           >
             <span className="text-base">𝕏</span>
             闇（見栄）をシェアする

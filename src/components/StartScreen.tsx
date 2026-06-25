@@ -36,7 +36,7 @@ export function StartScreen({ onStart, questionCount }: Props) {
       {/* CTA */}
       <button
         onClick={onStart}
-        className="glow-cta animate-fade-up group relative mt-12 w-full max-w-xs rounded-2xl border border-blood/50 bg-noir-800/70 px-8 py-5 text-base font-bold tracking-wide backdrop-blur-sm sm:max-w-sm"
+        className="glow-cta glow-cta-noir group relative mt-12 w-full max-w-xs rounded-2xl border border-blood/50 bg-noir-800/70 px-8 py-5 text-base font-bold tracking-wide backdrop-blur-sm sm:max-w-sm"
         style={{ animationDelay: '0.15s' }}
       >
         <span className="bg-gradient-to-r from-white to-blood-soft bg-clip-text text-transparent">

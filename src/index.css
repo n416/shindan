@@ -63,20 +63,33 @@
    発光 CTA：ホバーで明滅するネオン
 ─────────────────────────────────────────────────────────── */
 @utility glow-cta {
-  box-shadow:
-    0 0 0 rgba(194, 20, 59, 0),
-    inset 0 0 0 rgba(194, 20, 59, 0);
   transition:
     box-shadow 0.4s ease,
     transform 0.2s ease,
     border-color 0.3s ease;
 }
-@utility glow-cta {
+
+@utility glow-cta-noir {
+  box-shadow:
+    0 0 0 rgba(194, 20, 59, 0),
+    inset 0 0 0 rgba(194, 20, 59, 0);
   &:hover {
     box-shadow:
       0 0 24px rgba(226, 58, 93, 0.55),
       0 0 60px rgba(139, 92, 246, 0.25),
       inset 0 0 18px rgba(226, 58, 93, 0.25);
+  }
+}
+
+@utility glow-cta-lumen {
+  box-shadow:
+    0 0 0 rgba(252, 211, 77, 0),
+    inset 0 0 0 rgba(252, 211, 77, 0);
+  &:hover {
+    box-shadow:
+      0 0 24px rgba(253, 230, 138, 0.55),
+      0 0 60px rgba(253, 230, 138, 0.25),
+      inset 0 0 18px rgba(253, 230, 138, 0.25);
   }
 }
 
