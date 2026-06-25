@@ -2,16 +2,6 @@ import { useState, useEffect } from 'react';
 import type { DiagnosisResult, Scores } from '../types';
 import { serializeScores } from '../utils/share';
 import { PixelRunner } from './PixelRunner';
-import {
-  PERSONAS,
-  PERSONAS_LIGHT,
-  CHIMERA_PERSONA,
-  CHIMERA_PERSONA_LIGHT,
-  CHIMERA_3_PERSONAS,
-  CHIMERA_3_PERSONAS_LIGHT,
-  CHIMERA_4_PERSONA,
-  CHIMERA_4_PERSONA_LIGHT,
-} from '../data/personas';
 import { PERSONA_ADVICES, CHIMERA_ADVICES } from '../data/advices';
 
 interface Props {
@@ -33,15 +23,6 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
   const [showAdvice, setShowAdvice] = useState(false);
   const [animatingShare, setAnimatingShare] = useState<'lumen' | 'noir' | null>(null);
 
-  // ── URLの自動書き換え（シェアURLと一致させる） ──
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const url = new URL(window.location.href);
-    url.searchParams.set('r', serializeScores(scores));
-    url.searchParams.set('t', isLumen ? 'l' : 'n');
-    window.history.replaceState(null, '', url.toString());
-  }, [scores, isLumen]);
-
   const handleShare = (e: React.MouseEvent<HTMLAnchorElement>, url: string, type: 'lumen' | 'noir') => {
     e.preventDefault();
     if (animatingShare) return;
@@ -60,46 +41,23 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
   const [selectedType, setSelectedType] = useState(result.resolvedType);
 
   const { typeLabel, hasChimera } = result;
-  let persona = isLumen
-    ? PERSONAS_LIGHT[selectedType] ?? CHIMERA_PERSONA_LIGHT
-    : PERSONAS[selectedType] ?? CHIMERA_PERSONA;
+  // useQuiz.ts 側でキメラ対応済みの persona が返されるためそのまま利用する
+  const persona = isLumen ? result.personaLight : result.persona;
   const conflicts = isLumen ? result.chimeraConflictsLight : result.chimeraConflicts;
   const showGlitch = hasChimera && !isLumen; // 光モードではグリッチを止める
 
-  // ── キメラ時の通り名（称号）の上書き ──
-  if (hasChimera) {
-    const conflictCount = result.chimeraConflicts.length;
-    if (conflictCount === 4) {
-      persona = {
-        ...persona,
-        title: isLumen ? CHIMERA_4_PERSONA_LIGHT.title : CHIMERA_4_PERSONA.title,
-      };
-    } else if (conflictCount === 3) {
-      // 確定している唯一の軸（winnerがnullでないもの）を見つける
-      const resolvedAxis = result.axes.find((a) => !a.isChimera);
-      if (resolvedAxis && resolvedAxis.winner) {
-        const p3 = isLumen
-          ? CHIMERA_3_PERSONAS_LIGHT[resolvedAxis.winner]
-          : CHIMERA_3_PERSONAS[resolvedAxis.winner];
-        if (p3) {
-          persona = { ...persona, title: p3.title };
-        }
-      }
-    } else {
-      // 1軸・2軸のキメラ：候補から最初と最後のパーツを合成
-      const firstType = candidates[0];
-      const lastType = candidates[candidates.length - 1];
-      const p1 = isLumen ? PERSONAS_LIGHT[firstType] : PERSONAS[firstType];
-      const p2 = isLumen ? PERSONAS_LIGHT[lastType] : PERSONAS[lastType];
-      
-      if (p1?.prefix && p2?.suffix) {
-        persona = {
-          ...persona,
-          title: `${p1.prefix}${p2.suffix}`,
-        };
-      }
-    }
-  }
+  // ── URLの自動書き換え ──
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
+    // URL書き換え
+    const url = new URL(window.location.href);
+    const rParam = serializeScores(scores);
+    const tParam = isLumen ? 'l' : 'n';
+    url.searchParams.set('r', rParam);
+    url.searchParams.set('t', tParam);
+    window.history.replaceState(null, '', url.toString());
+  }, [scores, isLumen]);
 
   // ── トーンごとのアクセント ──
   const accent = isLumen
@@ -144,41 +102,8 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
     ? `${window.location.origin}${window.location.pathname}?r=${serializeScores(scores)}`
     : 'https://example.com';
 
-  const pLight = PERSONAS_LIGHT[result.resolvedType] ?? CHIMERA_PERSONA_LIGHT;
-  const pNoir = PERSONAS[result.resolvedType] ?? CHIMERA_PERSONA;
-
-  // キメラ判定等の上書きロジックは ResultScreen.tsx 冒頭で persona に適用されているが、
-  // ここではシェア文言用に改めて取得するか、上記で求めた persona のロジックを使う。
-  // 実は `persona` は `tone` に依存して決まるため、ここではシェア用に両方の persona を作ります。
-  let sharePersonaLight = pLight;
-  let sharePersonaNoir = pNoir;
-  
-  if (hasChimera) {
-    const conflictCount = result.chimeraConflicts.length;
-    if (conflictCount === 4) {
-      sharePersonaLight = { ...sharePersonaLight, title: CHIMERA_4_PERSONA_LIGHT.title };
-      sharePersonaNoir = { ...sharePersonaNoir, title: CHIMERA_4_PERSONA.title };
-    } else if (conflictCount === 3) {
-      const resolvedAxis = result.axes.find((a) => !a.isChimera);
-      if (resolvedAxis && resolvedAxis.winner) {
-        if (CHIMERA_3_PERSONAS_LIGHT[resolvedAxis.winner]) {
-          sharePersonaLight = { ...sharePersonaLight, title: CHIMERA_3_PERSONAS_LIGHT[resolvedAxis.winner].title };
-        }
-        if (CHIMERA_3_PERSONAS[resolvedAxis.winner]) {
-          sharePersonaNoir = { ...sharePersonaNoir, title: CHIMERA_3_PERSONAS[resolvedAxis.winner].title };
-        }
-      }
-    } else {
-      const firstType = candidates[0];
-      const lastType = candidates[candidates.length - 1];
-      const pl1 = PERSONAS_LIGHT[firstType];
-      const pl2 = PERSONAS_LIGHT[lastType];
-      const pn1 = PERSONAS[firstType];
-      const pn2 = PERSONAS[lastType];
-      if (pl1?.prefix && pl2?.suffix) sharePersonaLight = { ...sharePersonaLight, title: `${pl1.prefix}${pl2.suffix}` };
-      if (pn1?.prefix && pn2?.suffix) sharePersonaNoir = { ...sharePersonaNoir, title: `${pn1.prefix}${pn2.suffix}` };
-    }
-  }
+  const sharePersonaLight = result.personaLight;
+  const sharePersonaNoir = result.persona;
 
   const shareTextLight = hasChimera
     ? `私の結果は ${typeLabel} ──「${sharePersonaLight.title}」。${result.chimeraConflictsLight.map(c => `${c.poles[0]}/${c.poles[1]}`).join('・')} 軸の二面性を併せ持つタイプらしい。`

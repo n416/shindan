@@ -18,6 +18,10 @@ import {
   PERSONAS_LIGHT,
   CHIMERA_PERSONA_LIGHT,
   AXIS_CHIMERA_TEXT_LIGHT,
+  CHIMERA_4_PERSONA,
+  CHIMERA_4_PERSONA_LIGHT,
+  CHIMERA_3_PERSONAS,
+  CHIMERA_3_PERSONAS_LIGHT,
 } from '../data/personas';
 
 // ─────────────────────────────────────────────────────────────
@@ -152,14 +156,51 @@ export function buildDiagnosis(scores: Scores): DiagnosisResult {
     text: AXIS_CHIMERA_TEXT_LIGHT[r.axis],
   }));
 
+  let finalPersona = { ...persona };
+  let finalPersonaLight = { ...personaLight };
+
+  if (hasChimera) {
+    const conflictCount = chimeraAxes.length;
+    if (conflictCount === 4) {
+      finalPersona.title = CHIMERA_4_PERSONA.title;
+      finalPersonaLight.title = CHIMERA_4_PERSONA_LIGHT.title;
+    } else if (conflictCount === 3) {
+      const resolvedAxis = axes.find((a) => !a.isChimera);
+      if (resolvedAxis && resolvedAxis.winner) {
+        const p3 = CHIMERA_3_PERSONAS[resolvedAxis.winner];
+        if (p3) finalPersona.title = p3.title;
+        const p3L = CHIMERA_3_PERSONAS_LIGHT[resolvedAxis.winner];
+        if (p3L) finalPersonaLight.title = p3L.title;
+      }
+    } else {
+      const candidates = axes
+        .map((a) => (a.isChimera ? a.poles : [a.winner as string]))
+        .reduce<string[]>((acc, opts) => acc.flatMap((p) => opts.map((x) => p + x)), ['']);
+      const firstType = candidates[0];
+      const lastType = candidates[candidates.length - 1];
+      
+      const p1 = PERSONAS[firstType];
+      const p2 = PERSONAS[lastType];
+      if (p1?.prefix && p2?.suffix) {
+        finalPersona.title = `${p1.prefix}${p2.suffix}`;
+      }
+      
+      const p1L = PERSONAS_LIGHT[firstType];
+      const p2L = PERSONAS_LIGHT[lastType];
+      if (p1L?.prefix && p2L?.suffix) {
+        finalPersonaLight.title = `${p1L.prefix}${p2L.suffix}`;
+      }
+    }
+  }
+
   return {
     axes,
     typeLabel,
     hasChimera,
     resolvedType,
-    persona,
+    persona: finalPersona,
     chimeraConflicts,
-    personaLight,
+    personaLight: finalPersonaLight,
     chimeraConflictsLight,
   };
 }

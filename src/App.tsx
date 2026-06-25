@@ -6,7 +6,7 @@ import { RevealScreen } from './components/RevealScreen';
 import { DebugPanel } from './components/DebugPanel';
 import { PreviewGallery } from './components/PreviewGallery';
 import { FrontGallery } from './components/FrontGallery';
-import { deserializeScores } from './utils/share';
+import { deserializeScores, serializeScores } from './utils/share';
 import { useState } from 'react';
 
 export default function App() {
@@ -93,6 +93,21 @@ export default function App() {
         <RevealScreen
           onSelect={(tone) => {
             setSelectedTone(tone);
+            // ここでクリックされた瞬間に保存する（自分自身の診断のみ）
+            if (quiz.result && quiz.scores) {
+              const rParam = serializeScores(quiz.scores);
+              const tParam = tone === 'lumen' ? 'l' : 'n';
+              const title = tone === 'lumen' ? quiz.result.personaLight.title : quiz.result.persona.title;
+              try {
+                localStorage.setItem('persona_last_result', JSON.stringify({
+                  typeLabel: quiz.result.typeLabel,
+                  title: title,
+                  urlParam: `?r=${rParam}&t=${tParam}`
+                }));
+              } catch (e) {
+                console.warn('Failed to save last result', e);
+              }
+            }
             quiz.goToResult();
           }}
         />
