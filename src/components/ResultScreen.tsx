@@ -359,24 +359,27 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
 
       {/* シェア & リトライ */}
       <div className="mt-11 flex w-full max-w-xs flex-col gap-3">
-        <a
-          href={xIntentUrlLight}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="glow-cta flex items-center justify-center gap-2 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-6 py-4 text-sm font-bold tracking-wide text-amber-200 backdrop-blur-sm hover:bg-amber-300/20"
-        >
-          <span className="text-base">𝕏</span>
-          光（強み）をシェアする
-        </a>
-        <a
-          href={xIntentUrlNoir}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="glow-cta flex items-center justify-center gap-2 rounded-2xl border border-blood/30 bg-blood/10 px-6 py-4 text-sm font-bold tracking-wide text-blood-soft backdrop-blur-sm hover:bg-blood/20"
-        >
-          <span className="text-base">𝕏</span>
-          闇（見栄）をシェアする
-        </a>
+        {isLumen ? (
+          <a
+            href={xIntentUrlLight}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="glow-cta flex items-center justify-center gap-2 rounded-2xl border border-amber-300/30 bg-amber-300/10 px-6 py-4 text-sm font-bold tracking-wide text-amber-200 backdrop-blur-sm hover:bg-amber-300/20"
+          >
+            <span className="text-base">𝕏</span>
+            光（強み）をシェアする
+          </a>
+        ) : (
+          <a
+            href={xIntentUrlNoir}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="glow-cta flex items-center justify-center gap-2 rounded-2xl border border-blood/30 bg-blood/10 px-6 py-4 text-sm font-bold tracking-wide text-blood-soft backdrop-blur-sm hover:bg-blood/20"
+          >
+            <span className="text-base">𝕏</span>
+            闇（見栄）をシェアする
+          </a>
+        )}
         <button
           onClick={onRetry}
           className="mt-2 rounded-2xl px-6 py-3 text-xs tracking-widest text-ash/60 transition-colors hover:text-ash"
