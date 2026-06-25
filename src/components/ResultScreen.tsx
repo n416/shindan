@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import type { DiagnosisResult, Scores } from '../types';
 import { serializeScores } from '../utils/share';
 import { PixelRunner } from './PixelRunner';
+import { PERSONAS, PERSONAS_LIGHT } from '../data/personas';
 import { PERSONA_ADVICES, CHIMERA_ADVICES } from '../data/advices';
 
 interface Props {
@@ -41,8 +42,19 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
   const [selectedType, setSelectedType] = useState(result.resolvedType);
 
   const { typeLabel, hasChimera } = result;
-  // useQuiz.ts 側でキメラ対応済みの persona が返されるためそのまま利用する
-  const persona = isLumen ? result.personaLight : result.persona;
+
+  // ── 画面表示用のペルソナ情報（選択中の顔に連動） ──
+  // タイトル(title)は useQuiz.ts で計算済みのキメラタイトルを使用し、
+  // 説明文(description, tagline)などは現在選択されている selectedType のものを使用する
+  const basePersona = isLumen
+    ? (PERSONAS_LIGHT[selectedType] ?? result.personaLight)
+    : (PERSONAS[selectedType] ?? result.persona);
+  
+  const persona = {
+    ...basePersona,
+    title: isLumen ? result.personaLight.title : result.persona.title,
+  };
+
   const conflicts = isLumen ? result.chimeraConflictsLight : result.chimeraConflicts;
   const showGlitch = hasChimera && !isLumen; // 光モードではグリッチを止める
 
