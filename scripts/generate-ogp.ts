@@ -67,14 +67,14 @@ function getPersonaData(pattern: string, isLumen: boolean) {
   const candidates = expandChimera(pattern);
   const conflictCount = pattern.split('').filter(c => c === 'X').length;
   
-  // OGP用のGIFは、常に最初の候補キャラクターのものを使う
+  // OGP用の画像は、常に最初の候補キャラクターのものを使う
   const representType = candidates[0].toLowerCase();
-  const gifUrl = `${BASE_URL}/sprites/runner-${representType}.gif`;
+  const imageUrl = `${BASE_URL}/ogp/${representType}.png`;
 
   // キメラではない場合
   if (conflictCount === 0) {
     const p = isLumen ? PERSONAS_LIGHT[pattern as keyof typeof PERSONAS_LIGHT] : PERSONAS[pattern as keyof typeof PERSONAS];
-    return { title: p?.title || '', gifUrl, tagline: p?.tagline || '' };
+    return { title: p?.title || '', imageUrl, tagline: p?.tagline || '' };
   }
 
   // 以下キメラの場合のタイトル合成（useQuiz.ts と同様）
@@ -106,7 +106,7 @@ function getPersonaData(pattern: string, isLumen: boolean) {
     return `(${poles[0]}/${poles[1]})`;
   }).join('');
 
-  return { title, gifUrl, typeLabel };
+  return { title, imageUrl, typeLabel };
 }
 
 async function main() {
@@ -148,10 +148,10 @@ async function main() {
       html = html.replace(/<meta name="twitter:description" content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${shareText}" />`);
       
       // 画像が存在すれば置換
-      if (data.gifUrl) {
-        html = html.replace(/<meta property="og:image" content=".*?"\s*\/?>/i, `<meta property="og:image" content="${data.gifUrl}" />`);
+      if (data.imageUrl) {
+        html = html.replace(/<meta property="og:image" content=".*?"\s*\/?>/i, `<meta property="og:image" content="${data.imageUrl}" />`);
         // Twitter Card Image
-        html = html.replace(/<meta name="twitter:image" content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${data.gifUrl}" />`);
+        html = html.replace(/<meta name="twitter:image" content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${data.imageUrl}" />`);
       }
 
       fs.writeFileSync(path.join(RESULT_DIR, fileName), html);
