@@ -294,6 +294,8 @@ export interface UseQuiz {
   back: () => void;
   /** 最初からやり直す */
   reset: () => void;
+  /** revealフェーズから結果画面へ進む */
+  goToResult: () => void;
 }
 
 export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
@@ -357,7 +359,7 @@ export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
   }, [phase, scores]);
 
   const progress = useMemo(() => {
-    if (phase === 'result') return 1;
+    if (phase === 'result' || phase === 'reveal') return 1;
     if (phase === 'start') return 0;
     return computeProgress(byAxis, answers);
   }, [phase, byAxis, answers]);
@@ -400,7 +402,7 @@ export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
 
       // 早期打ち切り込みで、次に出す問題があるか判定
       if (getAvailableQuestions(byAxis, nextAnswers).length === 0) {
-        setPhase('result');
+        setPhase('reveal');
       }
     },
     [byAxis, answers, currentQuestion],
@@ -425,6 +427,10 @@ export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
     setPhase('start');
   }, []);
 
+  const goToResult = useCallback(() => {
+    setPhase('result');
+  }, []);
+
   return {
     phase,
     questions,
@@ -441,5 +447,6 @@ export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
     answer,
     back,
     reset,
+    goToResult,
   };
 }

@@ -265,42 +265,6 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
         {persona.description}
       </p>
 
-      {/* 視点の切替（説明の下に・役割が分かる形で） */}
-      <div className="animate-fade-up mt-8 w-full max-w-md" style={{ animationDelay: '0.33s' }}>
-        <p className="mb-2.5 text-center text-[11px] tracking-[0.3em] text-ash/50">
-          ── この結果には、もう一つの顔がある ──
-        </p>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => setTone('lumen')}
-            aria-pressed={isLumen}
-            className={`rounded-2xl border px-4 py-3 transition-all ${
-              isLumen
-                ? 'border-amber-300/50 bg-amber-300/15 text-amber-200'
-                : 'border-white/10 bg-noir-800/50 text-ash/50 hover:text-ash'
-            }`}
-          >
-            <span className="block text-sm font-bold">☀ 光 LUMEN</span>
-            <span className="mt-0.5 block text-[10px] tracking-widest opacity-80">
-              あなたの強み
-            </span>
-          </button>
-          <button
-            onClick={() => setTone('noir')}
-            aria-pressed={!isLumen}
-            className={`rounded-2xl border px-4 py-3 transition-all ${
-              !isLumen
-                ? 'border-blood/50 bg-blood/15 text-blood-soft'
-                : 'border-white/10 bg-noir-800/50 text-ash/50 hover:text-ash'
-            }`}
-          >
-            <span className="block text-sm font-bold">🌑 闇 NOIR</span>
-            <span className="mt-0.5 block text-[10px] tracking-widest opacity-80">
-              見栄と恐怖
-            </span>
-          </button>
-        </div>
-      </div>
 
       {/* 同票（キメラ）軸ごとのテキスト：該当軸の分だけ動的に差し込む */}
       {conflicts.length > 0 && (
@@ -386,6 +350,43 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
         >
           ↺ もう一度診断する
         </button>
+
+        {/* 視点の切替（シェアボタンの下に配置） */}
+        <div className="animate-fade-up mt-6 w-full" style={{ animationDelay: '0.4s' }}>
+          <p className="mb-3 text-center text-[11px] tracking-[0.2em] text-ash/50">
+            ── この結果には、もう一つの顔がある ──
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setTone('lumen')}
+              aria-pressed={isLumen}
+              className={`rounded-2xl border px-3 py-3 transition-all ${
+                isLumen
+                  ? 'border-amber-300/50 bg-amber-300/15 text-amber-200'
+                  : 'border-white/10 bg-noir-800/50 text-ash/50 hover:text-ash'
+              }`}
+            >
+              <span className="block text-xs font-bold">☀ 光 LUMEN</span>
+              <span className="mt-0.5 block text-[9px] tracking-widest opacity-80">
+                あなたの強み
+              </span>
+            </button>
+            <button
+              onClick={() => setTone('noir')}
+              aria-pressed={!isLumen}
+              className={`rounded-2xl border px-3 py-3 transition-all ${
+                !isLumen
+                  ? 'border-blood/50 bg-blood/15 text-blood-soft'
+                  : 'border-white/10 bg-noir-800/50 text-ash/50 hover:text-ash'
+              }`}
+            >
+              <span className="block text-xs font-bold">🌑 闇 NOIR</span>
+              <span className="mt-0.5 block text-[9px] tracking-widest opacity-80">
+                見栄と恐怖
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );

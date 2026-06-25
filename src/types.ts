@@ -99,4 +99,4 @@ export interface Persona {
 }
 
 /** 画面フェーズ */
-export type Phase = 'start' | 'question' | 'result';
+export type Phase = 'start' | 'question' | 'reveal' | 'result';

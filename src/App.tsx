@@ -2,10 +2,12 @@ import { useQuiz, buildDiagnosis } from './hooks/useQuiz';
 import { StartScreen } from './components/StartScreen';
 import { QuestionScreen } from './components/QuestionScreen';
 import { ResultScreen } from './components/ResultScreen';
+import { RevealScreen } from './components/RevealScreen';
 import { DebugPanel } from './components/DebugPanel';
 import { PreviewGallery } from './components/PreviewGallery';
 import { FrontGallery } from './components/FrontGallery';
 import { deserializeScores } from './utils/share';
+import { useState } from 'react';
 
 export default function App() {
   const isDebug =
@@ -14,6 +16,7 @@ export default function App() {
       : false;
 
   const quiz = useQuiz({ isDebug });
+  const [selectedTone, setSelectedTone] = useState<'lumen' | 'noir' | null>(null);
 
   // 開発用：?fronts で全タイプの正面デザイン一覧、?preview で走り一覧（クイズをスキップ）
   if (typeof window !== 'undefined') {
@@ -86,8 +89,22 @@ export default function App() {
         />
       )}
 
+      {quiz.phase === 'reveal' && (
+        <RevealScreen
+          onSelect={(tone) => {
+            setSelectedTone(tone);
+            quiz.goToResult();
+          }}
+        />
+      )}
+
       {quiz.phase === 'result' && quiz.result && (
-        <ResultScreen result={quiz.result} scores={quiz.scores} onRetry={quiz.reset} />
+        <ResultScreen
+          result={quiz.result}
+          scores={quiz.scores}
+          onRetry={quiz.reset}
+          initialTone={selectedTone ?? undefined}
+        />
       )}
 
       {/* 隠しデバッグパネル（全フェーズで右下に常駐） */}
