@@ -18,6 +18,11 @@ export default function App() {
   const quiz = useQuiz({ isDebug });
   const [selectedTone, setSelectedTone] = useState<'lumen' | 'noir' | null>(null);
 
+  const baseUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}${import.meta.env.BASE_URL}`
+    : '/';
+  const basePath = typeof window !== 'undefined' ? import.meta.env.BASE_URL : '/';
+
   // 開発用：?fronts で全タイプの正面デザイン一覧、?preview で走り一覧（クイズをスキップ）
   if (typeof window !== 'undefined') {
     const params = new URLSearchParams(window.location.search);
@@ -55,7 +60,7 @@ export default function App() {
                 scores={scores}
                 initialTone={initialTone}
                 onRetry={() => {
-                  window.location.href = window.location.origin + window.location.pathname;
+                  window.location.href = baseUrl;
                 }}
               />
             </main>
@@ -118,7 +123,7 @@ export default function App() {
           result={quiz.result}
           scores={quiz.scores}
           onRetry={() => {
-            window.history.replaceState(null, '', window.location.pathname);
+            window.history.replaceState(null, '', basePath);
             quiz.reset();
           }}
           initialTone={selectedTone ?? undefined}

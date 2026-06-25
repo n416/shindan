@@ -110,9 +110,15 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
     : PERSONA_ADVICES[selectedType];
 
   // ── シェア文の生成（光・闇の2種類を固定で生成） ──
-  const baseShareUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}${window.location.pathname}?r=${serializeScores(scores)}`
-    : 'https://example.com';
+  const patternString = result.axes.map(a => a.isChimera ? 'X' : a.winner).join('');
+  // ViteのBASE_URLを考慮して絶対URLを構築
+  const baseUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}${import.meta.env.BASE_URL}`
+    : 'https://example.com/';
+    
+  // パラメータを含めずにパターンのHTMLを直接指定する
+  const shareUrlLight = `${baseUrl}result/${patternString}-lumen.html?r=${serializeScores(scores)}`;
+  const shareUrlNoir = `${baseUrl}result/${patternString}-noir.html?r=${serializeScores(scores)}`;
 
   const sharePersonaLight = result.personaLight;
   const sharePersonaNoir = result.persona;
@@ -127,11 +133,11 @@ export function ResultScreen({ result, scores, initialTone, onRetry }: Props) {
 
   const xIntentUrlLight = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     `${shareTextLight}\n#PERSONA_NOIR で本当の強みを発見された。`
-  )}&url=${encodeURIComponent(`${baseShareUrl}&t=l`)}`;
+  )}&url=${encodeURIComponent(shareUrlLight)}`;
 
   const xIntentUrlNoir = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
     `${shareTextNoir}\n#PERSONA_NOIR で見栄と恐怖を暴かれてきた。`
-  )}&url=${encodeURIComponent(`${baseShareUrl}&t=n`)}`;
+  )}&url=${encodeURIComponent(shareUrlNoir)}`;
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-xl flex-col items-center px-6 pb-14 pt-14 text-center">
