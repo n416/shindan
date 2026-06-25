@@ -343,7 +343,10 @@ export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
     if (flipChoices[selected.id]) {
       return {
         ...selected,
-        choices: [selected.choices[1], selected.choices[0]] as [Choice, Choice],
+        choices: [
+          { ...selected.choices[1], label: 'A' },
+          { ...selected.choices[0], label: 'B' },
+        ] as [Choice, Choice],
       };
     }
     return selected;
