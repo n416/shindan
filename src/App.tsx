@@ -55,7 +55,7 @@ export default function App() {
                 scores={scores}
                 initialTone={initialTone}
                 onRetry={() => {
-                  window.location.href = window.location.pathname;
+                  window.location.href = window.location.origin + window.location.pathname;
                 }}
               />
             </main>
@@ -117,7 +117,10 @@ export default function App() {
         <ResultScreen
           result={quiz.result}
           scores={quiz.scores}
-          onRetry={quiz.reset}
+          onRetry={() => {
+            window.history.replaceState(null, '', window.location.pathname);
+            quiz.reset();
+          }}
           initialTone={selectedTone ?? undefined}
         />
       )}

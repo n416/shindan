@@ -398,7 +398,7 @@ export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
     : 0;
 
   const result = useMemo<DiagnosisResult | null>(() => {
-    if (phase !== 'result') return null;
+    if (phase !== 'result' && phase !== 'reveal') return null;
     return buildDiagnosis(scores);
   }, [phase, scores]);
 
