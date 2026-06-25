@@ -67,32 +67,46 @@ function groupByAxis(questions: Question[]): Record<AxisKey, Question[]> {
 
 type AnswerMap = Record<string, Choice>;
 
+export interface UseQuizProps {
+  isDebug?: boolean;
+}
+
+// ── シャッフル用ユーティリティ ──
+function shuffleArray<T>(array: T[]): T[] {
+  const result = [...array];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 /**
- * 早期打ち切りロジックに基づき、次に出題すべき質問を導出する。
- * 全軸が確定済みなら null（= 結果へ）。
+ * 早期打ち切りロジックに基づき、次に出題「可能」なすべての質問を導出する。
+ * 戻り値が空配列なら全軸確定済み（= 結果へ）。
  */
-function resolveNextQuestion(
+function getAvailableQuestions(
   byAxis: Record<AxisKey, Question[]>,
   answers: AnswerMap,
-): Question | null {
+): Question[] {
+  const available: Question[] = [];
   for (const axis of AXIS_ORDER) {
     const qs = byAxis[axis]; // [Q1, Q2, Q3, Q4]
 
-    // Q1 未回答 → Q1 を出題
-    if (!answers[qs[0].id]) return qs[0];
-    // Q2 未回答 → Q2 を出題
-    if (!answers[qs[1].id]) return qs[1];
+    const a1 = answers[qs[0].id];
+    const a2 = answers[qs[1].id];
 
-    // Q1・Q2 が同票 → この軸は確定。Q3・Q4 はスキップして次の軸へ
-    if (answers[qs[0].id].pole === answers[qs[1].id].pole) continue;
+    // Q1, Q2 は未回答なら常に候補
+    if (!a1) available.push(qs[0]);
+    if (!a2) available.push(qs[1]);
 
-    // Q1・Q2 が割れた → 延長戦（Q3・Q4）
-    if (!answers[qs[2].id]) return qs[2];
-    if (!answers[qs[3].id]) return qs[3];
-
-    // 4問とも回答済み → 次の軸へ
+    // Q1, Q2 を両方回答していて、かつ割れている場合のみ Q3, Q4 が候補になる
+    if (a1 && a2 && a1.pole !== a2.pole) {
+      if (!answers[qs[2].id]) available.push(qs[2]);
+      if (!answers[qs[3].id]) available.push(qs[3]);
+    }
   }
-  return null; // 全軸確定
+  return available;
 }
 
 /** スコアから1軸の判定を行う（2-2 のみキメラ） */
@@ -243,16 +257,9 @@ function computeNextIdHint(
   if (idx === 0) return qs[1].id;                 // Q1 → Q2（確定）
   if (idx === 2) return qs[3].id;                 // Q3 → Q4（確定）
   if (idx === 1) {
-    // Q2 直後は分岐：同票→次軸へスキップ / 割れ→延長戦(Q3・Q4 を必ず両方)
-    return `分岐 (同票→次軸スキップ / 割れ→延長 ${qs[2].id}+${qs[3].id})`;
+    return `分岐 (同票→次軸へ / 割れ→延長 ${qs[2].id}+${qs[3].id})`;
   }
-  // idx === 3（Q4）→ 次の軸の Q1、無ければ結果へ
-  const here = AXIS_ORDER.indexOf(current.axis);
-  for (let i = here + 1; i < AXIS_ORDER.length; i++) {
-    const first = byAxis[AXIS_ORDER[i]][0];
-    if (first) return first.id;
-  }
-  return '(→ 結果へ)';
+  return '(ランダム選出のため予測不可)';
 }
 
 export interface UseQuiz {
@@ -289,13 +296,15 @@ export interface UseQuiz {
   reset: () => void;
 }
 
-export function useQuiz(): UseQuiz {
+export function useQuiz({ isDebug = false }: UseQuizProps = {}): UseQuiz {
   const questions = QUESTIONS; // 後で fetch 結果に差し替え可能
   const byAxis = useMemo(() => groupByAxis(questions), [questions]);
 
   const [phase, setPhase] = useState<Phase>('start');
   const [answers, setAnswers] = useState<AnswerMap>({});
   const [answeredOrder, setAnsweredOrder] = useState<string[]>([]);
+  const [questionOrder, setQuestionOrder] = useState<string[]>([]);
+  const [flipChoices, setFlipChoices] = useState<Record<string, boolean>>({});
 
   // 回答からスコアを都度計算（単一の真実の源）
   const scores = useMemo<Scores>(() => {
@@ -306,11 +315,37 @@ export function useQuiz(): UseQuiz {
     return s;
   }, [answers]);
 
-  // 早期打ち切りロジックで導く現在の質問
+  // 早期打ち切りロジックとランダム化で導く現在の質問
   const currentQuestion = useMemo<Question | null>(() => {
     if (phase !== 'question') return null;
-    return resolveNextQuestion(byAxis, answers);
-  }, [phase, byAxis, answers]);
+    const available = getAvailableQuestions(byAxis, answers);
+    if (available.length === 0) return null;
+
+    let selected: Question;
+    if (isDebug) {
+      // デバッグモード時は従来の出題順（候補の先頭）
+      selected = available[0];
+    } else {
+      // 通常モード時は questionOrder の中で最も優先度が高い（インデックスが小さい）ものを選ぶ
+      selected = available.reduce((best, current) => {
+        const bestIdx = questionOrder.indexOf(best.id);
+        const currentIdx = questionOrder.indexOf(current.id);
+        // questionOrder に無い等の例外回避
+        if (bestIdx === -1) return current;
+        if (currentIdx === -1) return best;
+        return currentIdx < bestIdx ? current : best;
+      });
+    }
+
+    // 選択肢の反転処理
+    if (flipChoices[selected.id]) {
+      return {
+        ...selected,
+        choices: [selected.choices[1], selected.choices[0]] as [Choice, Choice],
+      };
+    }
+    return selected;
+  }, [phase, byAxis, answers, isDebug, questionOrder, flipChoices]);
 
   const currentAxisIndex = currentQuestion
     ? AXIS_ORDER.indexOf(currentQuestion.axis)
@@ -340,24 +375,35 @@ export function useQuiz(): UseQuiz {
   const start = useCallback(() => {
     setAnswers({});
     setAnsweredOrder([]);
+    
+    // 全問題のIDをシャッフル
+    const qIds = [...questions].map((q) => q.id);
+    setQuestionOrder(shuffleArray(qIds));
+    
+    // 選択肢の反転フラグを50%で設定
+    const flips: Record<string, boolean> = {};
+    for (const id of qIds) {
+      flips[id] = Math.random() < 0.5;
+    }
+    setFlipChoices(flips);
+    
     setPhase('question');
-  }, []);
+  }, [questions]);
 
   const answer = useCallback(
     (choice: Choice) => {
-      const q = resolveNextQuestion(byAxis, answers);
-      if (!q) return;
+      if (!currentQuestion) return;
 
-      const nextAnswers: AnswerMap = { ...answers, [q.id]: choice };
+      const nextAnswers: AnswerMap = { ...answers, [currentQuestion.id]: choice };
       setAnswers(nextAnswers);
-      setAnsweredOrder((prev) => [...prev, q.id]);
+      setAnsweredOrder((prev) => [...prev, currentQuestion.id]);
 
       // 早期打ち切り込みで、次に出す問題があるか判定
-      if (!resolveNextQuestion(byAxis, nextAnswers)) {
+      if (getAvailableQuestions(byAxis, nextAnswers).length === 0) {
         setPhase('result');
       }
     },
-    [byAxis, answers],
+    [byAxis, answers, currentQuestion],
   );
 
   const back = useCallback(() => {

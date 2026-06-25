@@ -6,8 +6,14 @@ import { DebugPanel } from './components/DebugPanel';
 import { PreviewGallery } from './components/PreviewGallery';
 import { FrontGallery } from './components/FrontGallery';
 import { deserializeScores } from './utils/share';
+
 export default function App() {
-  const quiz = useQuiz();
+  const isDebug =
+    typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('debug') === 'true'
+      : false;
+
+  const quiz = useQuiz({ isDebug });
 
   // 開発用：?fronts で全タイプの正面デザイン一覧、?preview で走り一覧（クイズをスキップ）
   if (typeof window !== 'undefined') {
@@ -85,14 +91,16 @@ export default function App() {
       )}
 
       {/* 隠しデバッグパネル（全フェーズで右下に常駐） */}
-      <DebugPanel
-        phase={quiz.phase}
-        scores={quiz.scores}
-        axisDebug={quiz.axisDebug}
-        currentQuestionId={quiz.currentQuestion?.id ?? null}
-        nextQuestionId={quiz.nextQuestionId}
-        answeredCount={quiz.answeredOrder.length}
-      />
+      {isDebug && (
+        <DebugPanel
+          phase={quiz.phase}
+          scores={quiz.scores}
+          axisDebug={quiz.axisDebug}
+          currentQuestionId={quiz.currentQuestion?.id ?? null}
+          nextQuestionId={quiz.nextQuestionId}
+          answeredCount={quiz.answeredOrder.length}
+        />
+      )}
     </main>
   );
 }
