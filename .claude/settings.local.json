@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\\\\n\" http://localhost:5174/)",
+      "Bash(curl -s http://localhost:5174/src/data/questions.ts -o /dev/null -w \"questions.ts: HTTP %{http_code}\\\\n\")",
+      "Bash(node -e 'let s=\"\";process.stdin.on\\(\"data\",d=>s+=d\\).on\\(\"end\",\\(\\)=>{let j=JSON.parse\\(s\\);let arr=Array.isArray\\(j\\)?j:\\(j.characters||j.items||[]\\);arr.slice\\(0,4\\).forEach\\(c=>console.log\\(c.created_at, c.id, \"anims:\",c.animation_count, \"|\", \\(c.name||\"\"\\).slice\\(0,30\\)\\)\\);}\\)')",
+      "Bash(python -c ' *)",
+      "Bash(node -e 'let s=\"\";process.stdin.on\\(\"data\",d=>s+=d\\).on\\(\"end\",\\(\\)=>{const d=JSON.parse\\(s\\);console.log\\(\"view:\",d.view,\"size:\",JSON.stringify\\(d.size\\)\\);for\\(const a of d.animations\\){console.log\\(\"anim_type:\",a.animation_type,\"| display:\",a.display_name,\"| dirs:\",a.directions.map\\(x=>x.direction+\":\"+x.frame_count\\).join\\(\",\"\\)\\);}}\\)')",
+      "Bash(python -u scripts/gen_runner.py ENTJ --ref --force --dump)",
+      "Bash(node -e 'let s=\"\";process.stdin.on\\(\"data\",d=>s+=d\\).on\\(\"end\",\\(\\)=>{let j=JSON.parse\\(s\\);console.log\\(\"status:\",j.status\\);}\\)')",
+      "Bash(python -u scripts/gen_runner.py ALL --ref)",
+      "Bash(tasklist //FI \"IMAGENAME eq python.exe\")",
+      "Bash(taskkill //F //IM python.exe)",
+      "Bash(rm -f scripts/gen_spin.py)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('scripts/gen_runner.py',encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(python -u scripts/gen_runner.py ENTP ENFJ ISTJ ISFJ ESTP --ref --force --reuse-front --parallel 3)",
+      "Bash(grep -oiE \".{80}\\(concurrent|rate.?limit|maximum|max |allowed|per minute|per second|limit of|up to\\)[^\\\\\"]{0,80}\" pl_v2.json)",
+      "Bash(node -e ' *)"
+    ]
+  }
+}

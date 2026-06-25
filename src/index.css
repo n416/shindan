@@ -1,0 +1,249 @@
+@import 'tailwindcss';
+
+/* ───────────────────────────────────────────────────────────
+   テーマ：黒基調 × 深紅/紫の神秘的なダークトーン
+─────────────────────────────────────────────────────────── */
+@theme {
+  --color-noir-950: #08070b;
+  --color-noir-900: #0d0b12;
+  --color-noir-800: #15121d;
+  --color-noir-700: #211c2e;
+  --color-blood: #c2143b;
+  --color-blood-soft: #e23a5d;
+  --color-violet-glow: #8b5cf6;
+  --color-ash: #a9a3b8;
+
+  --font-display: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN',
+    'Yu Gothic', system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #1a0e1f 0%, transparent 55%),
+      radial-gradient(100% 60% at 50% 110%, #120b1c 0%, transparent 50%),
+      var(--color-noir-950);
+    color: #efeaf6;
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: 0.02em;
+  }
+
+  /* 全体に薄いノイズ／走査線の質感を重ねる */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.05;
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.6) 0px,
+      rgba(255, 255, 255, 0.6) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: overlay;
+  }
+
+  ::selection {
+    background: var(--color-blood);
+    color: #fff;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   発光 CTA：ホバーで明滅するネオン
+─────────────────────────────────────────────────────────── */
+@utility glow-cta {
+  box-shadow:
+    0 0 0 rgba(194, 20, 59, 0),
+    inset 0 0 0 rgba(194, 20, 59, 0);
+  transition:
+    box-shadow 0.4s ease,
+    transform 0.2s ease,
+    border-color 0.3s ease;
+}
+@utility glow-cta {
+  &:hover {
+    box-shadow:
+      0 0 24px rgba(226, 58, 93, 0.55),
+      0 0 60px rgba(139, 92, 246, 0.25),
+      inset 0 0 18px rgba(226, 58, 93, 0.25);
+  }
+}
+
+/* ───────────────────────────────────────────────────────────
+   フェードイン
+─────────────────────────────────────────────────────────── */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ゆっくり脈打つ背景グロー */
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+.animate-pulse-slow {
+  animation: pulse-slow 4.5s ease-in-out infinite;
+}
+
+/* プログレスバーの走光 */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(220%); }
+}
+.animate-shimmer {
+  animation: shimmer 2.2s ease-in-out infinite;
+}
+
+/* ───────────────────────────────────────────────────────────
+   グリッチエフェクト（キメラ＝同票時のタイプ表示用）
+   赤シアンのズレ + チカチカ + 走査ノイズ
+─────────────────────────────────────────────────────────── */
+.glitch {
+  position: relative;
+  display: inline-block;
+  color: #fff;
+  animation: glitch-flicker 2.6s infinite steps(1);
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 赤チャンネルを左へずらす */
+.glitch::before {
+  color: var(--color-blood-soft);
+  z-index: -1;
+  animation: glitch-shift-x 2s infinite linear alternate-reverse;
+  clip-path: inset(0 0 0 0);
+}
+
+/* シアンチャンネルを右へずらす */
+.glitch::after {
+  color: #36e0e0;
+  z-index: -2;
+  animation: glitch-shift-y 1.6s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-flicker {
+  0%, 100% { opacity: 1; }
+  92% { opacity: 1; }
+  93% { opacity: 0.35; }
+  94% { opacity: 1; }
+  96% { opacity: 0.6; }
+  97% { opacity: 1; }
+}
+
+@keyframes glitch-shift-x {
+  0%   { transform: translate(0, 0); clip-path: inset(0 0 72% 0); }
+  20%  { transform: translate(-3px, -1px); clip-path: inset(28% 0 40% 0); }
+  40%  { transform: translate(3px, 1px); clip-path: inset(54% 0 12% 0); }
+  60%  { transform: translate(-2px, 0); clip-path: inset(10% 0 66% 0); }
+  80%  { transform: translate(2px, -1px); clip-path: inset(70% 0 4% 0); }
+  100% { transform: translate(0, 0); clip-path: inset(0 0 72% 0); }
+}
+
+@keyframes glitch-shift-y {
+  0%   { transform: translate(0, 0); clip-path: inset(40% 0 30% 0); }
+  25%  { transform: translate(3px, 1px); clip-path: inset(6% 0 80% 0); }
+  50%  { transform: translate(-3px, -1px); clip-path: inset(60% 0 10% 0); }
+  75%  { transform: translate(2px, 1px); clip-path: inset(20% 0 50% 0); }
+  100% { transform: translate(-2px, 0); clip-path: inset(40% 0 30% 0); }
+}
+
+/* ───────────────────────────────────────────────────────────
+   ドット絵ランナー（結果画面でキャラが画面を横切って走る）
+   GIF 自体が足の動きをループ再生し、ここでは左→右の走行を担う。
+─────────────────────────────────────────────────────────── */
+.pixel-runner-track {
+  position: relative;
+  width: 100%;
+  height: 128px;
+  overflow: hidden;
+  /* 左右端をフェードさせて画面外から走り込む／走り去る感を出す */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+}
+
+/* 中央のうっすらした発光（暗いキャラを背景から浮かせる） */
+.pixel-runner-track::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    55% 75% at 50% 72%,
+    rgba(var(--runner-glow-rgb, 139, 92, 246), 0.22),
+    transparent 70%
+  );
+}
+
+/* うっすらした地面の線 */
+.pixel-runner-track::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-ash), transparent);
+  opacity: 0.3;
+}
+
+/*
+ * スプライト(GIF)は正方形の枠の中央に、高さ約50%・足元が枠下から約25%上、
+ * という共通フォーマット（PixelLab の Web 書き出しも API 出力も同比率）。
+ * なので「枠を固定高さ200pxで表示し、中央寄せ＋下に36pxはみ出させて足を
+ * 地面の線に乗せる」だけで、124pxでも244pxでも同じ見え方になる。
+ * 透過パディングは不可視なのでクロップ計算は不要。
+ */
+.pixel-runner {
+  position: absolute;
+  left: 50%;
+  bottom: -36px;
+  transform: translateX(-50%); /* 中央固定。GIF 自体が足を動かすので、その場走り */
+  height: 200px;
+  width: auto;
+  max-width: none;
+  image-rendering: pixelated; /* ドット絵を拡大してもボカさない肝 */
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6))
+    drop-shadow(0 0 10px rgba(54, 224, 224, 0.18));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glitch::before,
+  .glitch::after { animation: none; }
+  .glitch { animation: none; }
+  .animate-shimmer { animation: none; }
+  /* 走行は止め、中央でその場走り（GIF のループは残る） */
+  .pixel-runner {
+    animation: none;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
