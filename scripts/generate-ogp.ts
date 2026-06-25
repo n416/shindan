@@ -137,12 +137,13 @@ async function main() {
       // HTMLの置換
       let html = baseHtml;
       
-      // title, og:title, og:description, og:image の置換
-      // 既存の meta タグを正規表現で書き換える
+      const fileName = `${pattern}-${tone}.html`;
+      const fileUrl = `${BASE_URL}/result/${fileName}`;
       const siteName = 'PERSONA NOIR ── 見栄と恐怖の性格診断';
       html = html.replace(/<title>.*?<\/title>/, `<title>${data.title} | ${siteName}</title>`);
       html = html.replace(/<meta property="og:title" content=".*?"\s*\/?>/i, `<meta property="og:title" content="${data.title} | ${siteName}" />`);
       html = html.replace(/<meta property="og:description" content=".*?"\s*\/?>/i, `<meta property="og:description" content="${shareText}" />`);
+      html = html.replace(/<meta property="og:url" content=".*?"\s*\/?>/i, `<meta property="og:url" content="${fileUrl}" />`);
       html = html.replace(/<meta name="twitter:title" content=".*?"\s*\/?>/i, `<meta name="twitter:title" content="${data.title} | ${siteName}" />`);
       html = html.replace(/<meta name="twitter:description" content=".*?"\s*\/?>/i, `<meta name="twitter:description" content="${shareText}" />`);
       
@@ -153,7 +154,6 @@ async function main() {
         html = html.replace(/<meta name="twitter:image" content=".*?"\s*\/?>/i, `<meta name="twitter:image" content="${data.gifUrl}" />`);
       }
 
-      const fileName = `${pattern}-${tone}.html`;
       fs.writeFileSync(path.join(RESULT_DIR, fileName), html);
       generatedCount++;
     }
