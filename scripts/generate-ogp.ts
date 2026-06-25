@@ -73,7 +73,7 @@ function getPersonaData(pattern: string, isLumen: boolean) {
 
   // キメラではない場合
   if (conflictCount === 0) {
-    const p = isLumen ? PERSONAS_LIGHT[pattern] : PERSONAS[pattern];
+    const p = isLumen ? PERSONAS_LIGHT[pattern as keyof typeof PERSONAS_LIGHT] : PERSONAS[pattern as keyof typeof PERSONAS];
     return { title: p?.title || '', gifUrl, tagline: p?.tagline || '' };
   }
 
@@ -85,16 +85,16 @@ function getPersonaData(pattern: string, isLumen: boolean) {
     // 唯一確定している軸を探す
     const resolvedIndex = pattern.split('').findIndex(c => c !== 'X');
     const winner = pattern[resolvedIndex];
-    if (isLumen && CHIMERA_3_PERSONAS_LIGHT[winner]) {
-      title = CHIMERA_3_PERSONAS_LIGHT[winner].title;
-    } else if (!isLumen && CHIMERA_3_PERSONAS[winner]) {
-      title = CHIMERA_3_PERSONAS[winner].title;
+    if (isLumen && CHIMERA_3_PERSONAS_LIGHT[winner as keyof typeof CHIMERA_3_PERSONAS_LIGHT]) {
+      title = CHIMERA_3_PERSONAS_LIGHT[winner as keyof typeof CHIMERA_3_PERSONAS_LIGHT].title;
+    } else if (!isLumen && CHIMERA_3_PERSONAS[winner as keyof typeof CHIMERA_3_PERSONAS]) {
+      title = CHIMERA_3_PERSONAS[winner as keyof typeof CHIMERA_3_PERSONAS].title;
     }
   } else {
     const firstType = candidates[0];
     const lastType = candidates[candidates.length - 1];
-    const p1 = isLumen ? PERSONAS_LIGHT[firstType] : PERSONAS[firstType];
-    const p2 = isLumen ? PERSONAS_LIGHT[lastType] : PERSONAS[lastType];
+    const p1 = isLumen ? PERSONAS_LIGHT[firstType as keyof typeof PERSONAS_LIGHT] : PERSONAS[firstType as keyof typeof PERSONAS];
+    const p2 = isLumen ? PERSONAS_LIGHT[lastType as keyof typeof PERSONAS_LIGHT] : PERSONAS[lastType as keyof typeof PERSONAS];
     if (p1?.prefix && p2?.suffix) {
       title = `${p1.prefix}${p2.suffix}`;
     }
